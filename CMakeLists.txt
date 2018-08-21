@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.11.1)
 project(python C ASM)
+include(CheckTypeSize)
+include(FindThreads)
+
 
 
 set(LIBPYTHON_SRCS 
@@ -151,6 +154,16 @@ set(LIBPYTHON_SRCS
 include_directories(.)
 include_directories(Include)
 include_directories(Python)
+check_type_size("wchar_t" SIZEOF_WCHAR_T)
+if(${CMAKE_USE_PTHREADS_INIT})
+set(_POSIX_THREADS 1)
+endif({CMAKE_USE_PTHREADS_INIT})
+
+message("Got [${CMAKE_USE_PTHREADS_INIT}], [${CMAKE_THREAD_LIBS_INIT}]")
+
+configure_file(pyconfig.h.cfg pyconfig.h @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 
 add_library(libpython       SHARED ${LIBPYTHON_SRCS})
 add_library(libpythonStatic STATIC ${LIBPYTHON_SRCS})
